@@ -21,12 +21,16 @@ var keyVaultName = _generateRandomId('testkv', randomIds);
 
 _validateEnvironmentVariables();
 
+// service principal details for running the sample
 var clientId = process.env['CLIENT_ID']; // service principal
 var domain = process.env['DOMAIN']; // tenant id
 var secret = process.env['APPLICATION_SECRET'];
 var subscriptionId = process.env['AZURE_SUBSCRIPTION_ID'];
 var objectId = process.env['OBJECT_ID'];
+
+// service principal details that we want give access to the key vault.
 var objectIdForKeyVault = process.env['OBJECT_ID_KEYVAULT_OPERATIONS'];
+var keyVaultSp = process.env['SP_KEYVAULT_OPERATIONS'];
 
 var resourceClient, keyVaultManagementClient, keyVaultClient;
 
@@ -222,6 +226,7 @@ function updateKeyVault(callback) {
             var newAccessPolicyEntry = {
                 tenantId: domain,
                 objectId: objectIdForKeyVault,
+                applicationId: keyVaultSp,
                 permissions: {
                     keys: ['get', 'list', 'import'],
                     secrets: ['all']
@@ -287,6 +292,7 @@ function _validateEnvironmentVariables() {
     if (!process.env['AZURE_SUBSCRIPTION_ID']) envs.push('AZURE_SUBSCRIPTION_ID');
     if (!process.env['OBJECT_ID']) envs.push('OBJECT_ID');
     if (!process.env['OBJECT_ID_KEYVAULT_OPERATIONS']) envs.push('OBJECT_ID_KEYVAULT_OPERATIONS');
+    if (!process.env['SP_KEYVAULT_OPERATIONS']) envs.push('SP_KEYVAULT_OPERATIONS');
 
     if (envs.length > 0) {
         throw new Error(util.format('please set/export the following environment variables: %s', envs.toString()));

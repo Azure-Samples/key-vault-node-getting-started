@@ -46,7 +46,9 @@ To run this sample:
     export APPLICATION_SECRET={your client secret}
     export DOMAIN={your tenant id as a guid OR the domain name of your org <contosocorp.com>}
     export OBJECT_ID={Object id of the service principal}
-    export OBJECT_ID_KEYVAULT_OPERATIONS={Object id of the service principal of the app, that we want to authorize to interact with keyvault}
+    export SP_KEYVAULT_OPERATIONS={application id or Service principal of the app, that we want to authorize to interact with keyvault}
+    export OBJECT_ID_KEYVAULT_OPERATIONS={Object id of the app, that we want to authorize to interact with keyvault}
+
     ```
    > [AZURE.NOTE] On Windows, use `set` instead of `export`.
 
@@ -156,6 +158,7 @@ keyVaultManagementClient.vaults.get(resourceGroupName, keyVaultName,
         var newAccessPolicyEntry = {
             tenantId: domain,
             objectId: objectIdForKeyVault,
+            applicationId: keyVaultSp,
             permissions: {
                 keys: ['get', 'list', 'import'],
                 secrets: ['all']
