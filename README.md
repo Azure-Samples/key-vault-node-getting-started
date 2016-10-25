@@ -29,8 +29,6 @@ The app will need an API key to make the call, which we would store in the key v
 <a id="run"/>
 ## How to run this sample
 
-To run this sample:
-
 1. If you don't already have it, get [node.js](https://nodejs.org).
 
 2. Clone the repo.
