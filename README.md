@@ -9,7 +9,7 @@ author: balajikris
 This sample demonstrates how to create and manage a keyvault and interact with it in Node.js. We will also write an app
 that consumes information from the key vault.
 
-### Introduction
+## Introduction
 
 In this sample
 
@@ -19,24 +19,26 @@ Finally, we will authorize an application and give it permissions to interact wi
 (b) we will write a weather application that talks to the [openweathermap api](http://openweathermap.org/current) to retrieve the current weather data for a given city.
 The app will need an API key to make the call, which we would store in the key vault we provisioned in the above step and fetch from the app.
 
-##### On this page:
+**On this page:**
 
-- [How to run this sample](#how-to-run-this-sample)
-- [Understanding what index.js does](#understanding-what-index-js-does)
-- [Understanding what weather-app.js does](#understanding-what-weather-app-js-does)
-- [Understanding what cleanup.js does](#understanding-what-cleanup-js-does)
+- [How to run this sample](#run)
+- [Understanding what index.js does](#index)
+- [Understanding what weather-app.js does](#weather-app)
+- [Understanding what cleanup.js does](#cleanup)
 
-### how to run this sample
+<a id="run"/>
+## How to run this sample
 
 To run this sample:
 
-1. If you don't already have it, get [node.js](https://nodejs.org)
+1. If you don't already have it, get [node.js](https://nodejs.org).
 
-2. Clone the repo: 
+2. Clone the repo.
 
    `git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git`
 
-3. Install dependencies:
+3. Install the dependencies.
+
    ```
    cd key-vault-node-getting-started
    npm install
@@ -72,39 +74,36 @@ To run this sample:
     ```
    > [AZURE.NOTE] On Windows, use `set` instead of `export`.
 
-7. Run the sample.
+7. First we need to provision a key vault resource and authorize an app to use it.
 
-    (a) First we need to provision a key vault resource and authorize an app to use it.
+   `node index.js`
 
-    Execute `node index.js`
+8. Get an API key from [openweathermap](http://openweathermap.org/) and securely store it in key vault.
 
-    (b) Then, get an API key from [openweathermap](http://openweathermap.org/) and securely store it in key vault like so
+   `azure keyvault secret set --vault-name "<key vault name>" --secret-name "open-weather-map-key" "<api key>"`
 
-    From xplat-cli run `azure keyvault secret set --vault-name "<key vault name>" --secret-name "open-weather-map-key" "<api key>"`
-
-    Alternatively, you can accomplish this from the Azure portal as well. 
+   Alternatively, you can accomplish this from the Azure portal as well. 
     
-    > Note: 
-    > 
-    > you should be logged in with a service principal that has access to the key vault resource
-    > 
-    > the secret-name should match the environment variable (KEYVAULT_SECRET_NAME) exported in step 6 above and is also used in weather-app.js.
+    > [AZURE.NOTE] 
+    > You should be logged in with a service principal that has access to the key vault resource.
+    > The secret-name should match the environment variable (KEYVAULT_SECRET_NAME) exported
+    > in step 6 above and is also used in weather-app.js.
 
-    (c) Finally, we run an app that displays current weather conditions for a given city.
+9. Run an app that displays current weather conditions for a given city.
 
-    Execute `node weather-app.js <key vault name> <city>`
-
-    arguments passed in:
+    `node weather-app.js <key vault name> <city>`
 
     key vault name: not the whole url, just the name from https://&lt;vaultName&gt;.vault.azure.net/
 
-    city: format is <city name, country name/code> e.g: `redmond, us` or `London, uk`. country is optional but it helps in disambiguating city name.
+    city: format is <city name, country name/code> e.g: `redmond, us` or `London, uk`. country is optional but it helps
+    in disambiguating city name.
 
-8. To clean up and delete all the resources we created, run the cleanup script.
+10. To clean up and delete all the resources we created, run the cleanup script.
 
     `node cleanup.js <resourceGroupName> <keyVaultName>`
 
-### understanding what index js does
+<a id="index"/>
+## What index.js does
 
 The sample creates a new key vault, add a key and a secret to the vault, retrieve keys and secrets from it, authorizes an app to use this keyvault's resources.
 
@@ -222,7 +221,8 @@ console.log(`performing auto cleanup on error. deleting ${keyVaultName} and ${re
 cleanup(exit);
 ```
 
-### understanding what weather app js does
+<a id="weather-app"/>
+## What weather-app.js does
 
 The app starts by logging into the azure account, by using your service principal.
 
@@ -248,7 +248,8 @@ We then make an http request to openweathermap with the api key and city name an
 http.get(requestUri, (res) => {...});
 ```
 
-### understanding what cleanup js does
+<a id="cleanup"/>
+## What cleanup js does
 
 Running cleanup.js deletes the key vault that the sample created:
 ```
