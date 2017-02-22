@@ -226,7 +226,6 @@ function updateKeyVault(callback) {
             var newAccessPolicyEntry = {
                 tenantId: domain,
                 objectId: objectIdForKeyVault,
-                applicationId: keyVaultSp,
                 permissions: {
                     keys: ['get', 'list', 'import'],
                     secrets: ['all']
