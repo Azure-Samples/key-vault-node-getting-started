@@ -27,25 +27,28 @@ The app will need an API key to make the call, which we would store in the key v
 - [Understanding what cleanup.js does](#cleanup)
 
 <a id="run"/>
+
 ## How to run this sample
 
 1. If you don't already have it, get [node.js](https://nodejs.org).
 
 2. Clone the repo.
 
-   `git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git`
+   ```
+   git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git key-vault
+   ```
 
 3. Install the dependencies.
 
    ```
-   cd key-vault-node-getting-started
+   cd key-vault
    npm install
    ```
 
-4. Create an Azure service principals, using 
-    [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
-    [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
-    or [Azure Portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/).
+4. Create an Azure service principals, using one of the following:
+   - [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
+   - [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
+   - [Azure Portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/). 
 
     This service principal is to run the sample on your azure account.
 
@@ -57,50 +60,60 @@ The app will need an API key to make the call, which we would store in the key v
 
 6. Set the following environment variables using the information from the service principal that you created.
 
-    ```
-    export AZURE_SUBSCRIPION_ID={your subscription id}
-    export CLIENT_ID={your client id}
-    export APPLICATION_SECRET={your client secret}
-    export DOMAIN={your tenant id as a guid OR the domain name of your org <contosocorp.com>}
-    export OBJECT_ID={Object id of the service principal}
-    
-    export SP_KEYVAULT_OPERATIONS={application id of the app, that we want to authorize to interact with keyvault, created in step 5}
-    export OBJECT_ID_KEYVAULT_OPERATIONS={Object id of the app, that we want to authorize to interact with keyvault, created in step 5}
-    export WEATHER_APP_KEY={key value that we noted down in step 5}
+   ```
+   export AZURE_SUBSCRIPION_ID={your subscription id}
+   export CLIENT_ID={your client id}
+   export APPLICATION_SECRET={your client secret}
+   export DOMAIN={your tenant id as a guid OR the domain name of your org <contosocorp.com>}
+   export OBJECT_ID={Object id of the service principal}
 
-    export KEYVAULT_SECRET_NAME=open-weather-map-key
-    ```
-   > [AZURE.NOTE] On Windows, use `set` instead of `export`.
+   export SP_KEYVAULT_OPERATIONS={application id of the app, that we want to authorize to interact with keyvault, created in step 5}
+   export OBJECT_ID_KEYVAULT_OPERATIONS={Object id of the app, that we want to authorize to interact with keyvault, created in step 5}
+   export WEATHER_APP_KEY={key value that we noted down in step 5}
+
+   export KEYVAULT_SECRET_NAME=open-weather-map-key
+   ```
+
+> [AZURE.NOTE] On Windows, use `set` instead of `export`.
 
 7. First we need to provision a key vault resource and authorize an app to use it.
 
-   `node index.js`
+   ```
+   node index.js
+   ```
 
 8. Get an API key from [openweathermap](http://openweathermap.org/) and securely store it in key vault.
 
-   `azure keyvault secret set --vault-name "<key vault name>" --secret-name "open-weather-map-key" "<api key>"`
+   ```
+   azure keyvault secret set --vault-name "<key vault name>" --secret-name "open-weather-map-key" "<api key>"
+   ```
 
    Alternatively, you can accomplish this from the Azure portal as well. 
     
-    > [AZURE.NOTE] 
-    > You should be logged in with a service principal that has access to the key vault resource.
-    > The secret-name should match the environment variable (KEYVAULT_SECRET_NAME) exported
-    > in step 6 above and is also used in weather-app.js.
+   > [AZURE.NOTE] 
+   > You should be logged in with a service principal that has access to the key vault resource.
+   > The secret-name should match the environment variable (KEYVAULT_SECRET_NAME) exported
+   > in step 6 above and is also used in weather-app.js.
 
 9. Run an app that displays current weather conditions for a given city.
 
-    `node weather-app.js <key vault name> <city>`
+   ```
+   node weather-app.js <key vault name> <city>
+   ```
 
-    key vault name: not the whole url, just the name from https://&lt;vaultName&gt;.vault.azure.net/
+   key vault name: not the whole url, just the name from https://&lt;vaultName&gt;.vault.azure.net/
 
-    city: format is <city name, country name/code> e.g: `redmond, us` or `London, uk`. country is optional but it helps
-    in disambiguating city name.
+   city: format is <city name, country name/code> e.g: `redmond, us` or `London, uk`. country is optional but it helps
+   in disambiguating city name.
 
 10. To clean up and delete all the resources we created, run the cleanup script.
 
-    `node cleanup.js <resourceGroupName> <keyVaultName>`
+   ```
+   node cleanup.js <resourceGroupName> <keyVaultName>
+   ```
 
 <a id="index"/>
+
 ## What index.js does
 
 The sample creates a new key vault, add a key and a secret to the vault, retrieve keys and secrets from it, authorizes an app to use this keyvault's resources.
@@ -108,78 +121,78 @@ The sample creates a new key vault, add a key and a secret to the vault, retriev
 We start by logging in using your service principal and creating ResourceManagementClient and KeyVaultManagementClient objects. 
 We then perform an authentication handshake with the KeyVault service before creating a KeyVaultClient object.
 
-```
-msRestAzure.loginWithServicePrincipalSecret(clientId, secret, domain, function (err, credentials) {
-    if (err) return console.log(err);
-    resourceClient = new ResourceManagementClient(credentials, subscriptionId);
-    keyVaultManagementClient = new KeyVaultManagementClient(credentials, subscriptionId);
+   ```
+   msRestAzure.loginWithServicePrincipalSecret(clientId, secret, domain).then((err, credentials) => {
+       if (err) return console.log(err);
+       resourceClient = new ResourceManagementClient(credentials, subscriptionId);
+       keyVaultManagementClient = new KeyVaultManagementClient(credentials, subscriptionId);
 
-    var kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
-    keyVaultClient = new KeyVault.KeyVaultClient(kvCredentials);
-    ...
-```
+       var kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
+       keyVaultClient = new KeyVault.KeyVaultClient(kvCredentials);
+    });
+   ```
 
 We then set up a resource group in which we will create the key vault resource.
 
-```
-  var groupParameters = { location: location, tags: { sampletag: 'sampleValue' } };
-  return resourceClient.resourceGroups.createOrUpdate(resourceGroupName, groupParameters, callback);
-```
+   ```
+   let groupParameters = { location: location, tags: { sampletag: 'sampleValue' } };
+   return resourceClient.resourceGroups.createOrUpdate(resourceGroupName, groupParameters).then( /* ... */ );
+   ```
 
 The next step is to create and provision a key vault resource.
 
-```
-var keyPermissions = ['get', 'create', ...];
-var keyVaultParameters = {
-    location: location,
-    properties: {...},
-    tags: {}
-};
+   ```
+   let keyPermissions = ['get', 'create', ...];
+   let keyVaultParameters = {
+       location: location,
+       properties: {...},
+       tags: {}
+   };
 
-keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, keyVaultParameters, callback);
-```
+   keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, keyVaultParameters).then( /* ... */ );
+   ```
 
 One a key vault has been provisioned, we interact with it by 
 
 a. adding a key.
 
-```
-var attributes = { expires: new Date(...), notBefore: new Date(...) };
-var keyOperations = ['encrypt', 'decrypt', ...];
-var keyOptions = {
-    keyOps: keyOperations,
-    keyAttributes: attributes
-};
-var keyName = '<name>';
+   ```
+   let attributes = { expires: new Date(...), notBefore: new Date(...) };
+   let keyOperations = ['encrypt', 'decrypt', ...];
+   let keyOptions = {
+       keyOps: keyOperations,
+       keyAttributes: attributes
+   };
+   let keyName = '<name>';
 
-keyVaultClient.createKey(vaultUri, keyName, 'RSA', keyOptions, callback);
-```
+   keyVaultClient.createKey(vaultUri, keyName, 'RSA', keyOptions).then( /* ... */ );
+   ```
 
 b. set a secret.
 
-```
-var attributes = { expires: new Date(...), notBefore: new Date(...) };
-var secretOptions = {
-    contentType: 'test secret',
-    secretAttributes: attributes
-};
-var secretName = '<name>';
-var secretValue = '<value>';
+   ```
+   let attributes = { expires: new Date(...), notBefore: new Date(...) };
+   let secretOptions = {
+       contentType: 'test secret',
+       secretAttributes: attributes
+   };
+   let secretName = '<name>';
+   let secretValue = '<value>';
 
-keyVaultClient.setSecret(vaultUri, secretName, secretValue, secretOptions, callback);
-```
+   keyVaultClient.setSecret(vaultUri, secretName, secretValue, secretOptions).then( /*  ... */ );
+   ```
 
 c. get all keys from the vault.
 
-```
-keyVaultClient.getKeys(vaultUri, callback);
-```
+   ```
+   keyVaultClient.getKeys(vaultUri).then( /*  ... */ );
+   ```
 
 d. get all secrets from the vault.
 
-```
-keyVaultClient.getSecrets(vaultUri, callback);
-```
+   ```
+   keyVaultClient.getSecrets(vaultUri).then( /*  ... */ );
+   ```
 
 Finally, we authorize an app to interact with keyvault, by specifying an access policy.
 To accomplish this, we first get the vault we created from the resource group using a `vaults.get` call.
@@ -187,39 +200,40 @@ We then call `createOrUpdate` on that vault, with updated parameters, which cont
 The `createOrUpdate` call will replace the parameters, so we copy the vault's original properties into our new 
 `parameters` object and append a new `accessPolicyEntry` to it.
 
-```
-keyVaultManagementClient.vaults.get(resourceGroupName, keyVaultName,
-    function (err, result, httpRequest, response) {
-        var vault = result;
+   ```
+   keyVaultManagementClient.vaults.get(resourceGroupName, keyVaultName)
+       .then((err, result, httpRequest, response) => {
+           let vault = result;
 
-        var parameters = new keyVaultManagementClient.models.VaultCreateOrUpdateParameters();
-        parameters.location = vault.location;
-        parameters.properties = vault.properties;
+           let parameters = new keyVaultManagementClient.models.VaultCreateOrUpdateParameters();
+           parameters.location = vault.location;
+           parameters.properties = vault.properties;
 
-        var newAccessPolicyEntry = {
-            tenantId: domain,
-            objectId: objectIdForKeyVault,
-            applicationId: keyVaultSp,
-            permissions: {
-                keys: ['get', 'list', 'import'],
-                secrets: ['all']
-            }
-        };
+           let newAccessPolicyEntry = {
+               tenantId: domain,
+               objectId: objectIdForKeyVault,
+               applicationId: keyVaultSp,
+               permissions: {
+                   keys: ['get', 'list', 'import'],
+                   secrets: ['all']
+               }
+           };
 
-        parameters.properties.accessPolicies.push(newAccessPolicyEntry);
+           parameters.properties.accessPolicies.push(newAccessPolicyEntry);
 
-        keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, parameters, callback);
-    });
-```
+           keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, parameters).then( /* ... */ );
+       });
+   ```
 
 In case if we hit an error while executing these steps, we initiate an auto cleanup and exit.
 
-```
-console.log(`performing auto cleanup on error. deleting ${keyVaultName} and ${resourceGroupName}`);
-cleanup(exit);
-```
+   ```
+   console.log(`performing auto cleanup on error. deleting ${keyVaultName} and ${resourceGroupName}`);
+   cleanup(exit);
+   ```
 
 <a id="weather-app"/>
+
 ## What weather-app.js does
 
 The app starts by logging into the azure account, by using your service principal.
@@ -227,39 +241,42 @@ The app starts by logging into the azure account, by using your service principa
 We then authenticate with the KeyVault service by using the service principal that was previously authorized 
 to interact with the key vault in index.js (see: SP_KEYVAULT_OPERATIONS)
 
-```
-// authenticate with key vault with a service principal that we gave access in index.js
-var kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
-```
+   ```
+   // authenticate with key vault with a service principal that we gave access in index.js
+   let kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
+   ```
 
 Once authenticated, we fetch the secret's value from the key vault, which would be our API key for openweathermap.org
 
-```
-// get the secret's value (api key for openweathermap).
-keyVaultClient.getSecret(vaultUri, (err, result) => {...});
-```
+   ```
+   // get the secret's value (api key for openweathermap).
+   keyVaultClient.getSecret(vaultUri, (err, result) => { /* ... */ });
+   ```
 
 We then make an http request to openweathermap with the api key and city name and display the weather information.
 
-```
-// query openweathermap api and get weather data.
-http.get(requestUri, (res) => {...});
-```
+   ```
+   // query openweathermap api and get weather data.
+   http.get(requestUri, res => { /* ... */ });
+   ```
 
 <a id="cleanup"/>
+
 ## What cleanup js does
 
 Running cleanup.js deletes the key vault that the sample created:
-```
-console.log('\nDeleting key vault : ' + keyVaultName);
-return keyVaultManagementClient.vaults.deleteMethod(resourceGroupName, keyVaultName, callback);
-```
+
+   ```
+   console.log('\nDeleting key vault : ' + keyVaultName);
+   return keyVaultManagementClient.vaults.deleteMethod(resourceGroupName, keyVaultName).then( /* ... */ );
+   ```
 
 It also deletes the resource group that the sample created:
-```
-console.log('\nDeleting resource group: ' + resourceGroupName);
-return resourceClient.resourceGroups.deleteMethod(resourceGroupName, callback);
-```
+
+   ```
+   console.log('\nDeleting resource group: ' + resourceGroupName);
+   return resourceClient.resourceGroups.deleteMethod(resourceGroupName).then( /* ... */ );
+   ```
 
 ## References and further reading
 
