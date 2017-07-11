@@ -220,7 +220,7 @@ The `createOrUpdate` call will replace the parameters, so we copy the vault's or
 
            parameters.properties.accessPolicies.push(newAccessPolicyEntry);
 
-           keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, parameters, callback);
+           keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, parameters).then( /* ... */ );
        });
    ```
 
