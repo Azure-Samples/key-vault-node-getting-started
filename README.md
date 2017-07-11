@@ -27,6 +27,7 @@ The app will need an API key to make the call, which we would store in the key v
 - [Understanding what cleanup.js does](#cleanup)
 
 <a id="run"/>
+
 ## How to run this sample
 
 1. If you don't already have it, get [node.js](https://nodejs.org).
