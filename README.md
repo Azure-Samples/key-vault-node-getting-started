@@ -45,9 +45,9 @@ The app will need an API key to make the call, which we would store in the key v
    ```
 
 4. Create an Azure service principals, using one of the following:
-- [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
-- [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
-- [Azure Portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/). 
+   - [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
+   - [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
+   - [Azure Portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/). 
 
     This service principal is to run the sample on your azure account.
 
