@@ -262,7 +262,7 @@ We then make an http request to openweathermap with the api key and city name an
 
 <a id="cleanup"/>
 
-## What cleanup js does
+## What cleanup.js does
 
 Running cleanup.js deletes the key vault that the sample created:
 
