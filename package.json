@@ -1,39 +1,18 @@
 {
-  "name": "key-vault-node-getting-started",
-  "author": "Microsoft Corporation",
-  "contributors": [
-    "Krishnan, Balaji <balaji.krishnan@microsoft.com>"
-  ],
-  "version": "0.1.0",
-  "description": "A sample to demonstrate keyvault operations in nodejs.",
-  "tags": [
-    "azure",
-    "sdk"
-  ],
-  "keywords": [
-    "node",
-    "azure"
-  ],
-  "main": "./index.js",
-  "license": "MIT",
-  "dependencies": {
-    "adal-node": "^0.1.22",
-    "async": "0.2.7",
-    "azure-arm-authorization": "3.1.1",
-    "azure-arm-keyvault": "^0.11.4",
-    "azure-arm-resource": "^1.4.4-preview",
-    "azure-graph": "1.1.1",
-    "azure-keyvault": "^0.11.0",
-    "moment": "^2.15.1",
-    "ms-rest": "^1.15.0",
-    "ms-rest-azure": "^1.15.0"
-  },
-  "homepage": "https://github.com/Azure-Samples/key-vault-node-getting-started",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Azure-Samples/key-vault-node-getting-started"
-  },
-  "bugs": {
-    "url": "https://github.com/Azure-Samples/key-vault-node-getting-started/issues"
-  }
+    "name": "key-vault-node-quickstart",
+    "description": "Simple Hello World Node.js sample for Azure Key Vault using Managed Service Identity",
+    "version": "0.0.1",
+    "private": true,
+    "license": "MIT",
+    "author": "Microsoft",
+    "engines": {
+        "node": ">=6.9.1"
+    },
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "azure-keyvault": "^3.0.4",
+        "ms-rest-azure": "^2.5.7"
+    }
 }
