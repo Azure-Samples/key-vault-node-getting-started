@@ -1,287 +1,193 @@
 ---
 services: key-vault
 platforms: nodejs
-author: balajikris
+author: prashanthyv
 ---
 
-# Getting started with Key Vault in Node.js
+# Quickstart: Set and retrieve a secret from Azure Key Vault using a Node Web App 
 
-This sample demonstrates how to create and manage a keyvault and interact with it in Node.js. We will also write an app
-that consumes information from the key vault
+This QuickStart shows how to store a secret in Key Vault and how to retrieve it using a Web app. This web app may be  run locally or in Azure. The quickstart uses Node.js and Managed service identities (MSIs)
 
-## Introduction
+> * Create a Key Vault.
+> * Store a secret in Key Vault.
+> * Retrieve a secret from Key Vault.
+> * Create an Azure Web Application.
+> * [Enable managed service identities](https://docs.microsoft.com/azure/active-directory/managed-service-identity/overview).
+> * Grant the required permissions for the web application to read data from Key vault.
 
-In this sample
+Before you proceed make sure that you are familiar with the [basic concepts](key-vault-whatis.md#basic-concepts).
 
-(a) We will learn how to create and manage a keyvault. we will perform operations on it like storing and retrieving keys and secrets.
-Finally, we will authorize an application and give it permissions to interact with the vault.
+## Prerequisites
 
-(b) we will write a weather application that talks to the [openweathermap api](http://openweathermap.org/current) to retrieve the current weather data for a given city.
-The app will need an API key to make the call, which we would store in the key vault we provisioned in the above step and fetch from the app.
+* [Node JS](https://nodejs.org/en/)
+* [Git](https://www.git-scm.com/)
+* [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli?view=azure-cli-latest) 2.0.4 or later
+* An Azure subscription. If you don't have an Azure subscription, create a [free account](https://azure.microsoft.com/free/?WT.mc_id=A261C142F) before you begin.
 
-**On this page:**
+## Login to Azure
 
-- [How to run this sample](#run)
-- [Understanding what index.js does](#index)
-- [Understanding what weather-app.js does](#weather-app)
-- [Understanding what cleanup.js does](#cleanup)
+To log in to Azure using the CLI, you can type:
 
-<a id="run"/>
+```azurecli
+az login
+```
 
-## How to run this sample
+## Create resource group
 
-1. If you don't already have it, get [node.js](https://nodejs.org).
+Create a resource group with the [az group create](/cli/azure/group#az-group-create) command. An Azure resource group is a logical container into which Azure resources are deployed and managed.
 
-2. Clone the repo.
+Please select a Resource Group name and fill in the placeholder.
+The following example creates a resource group named *<YourResourceGroupName>* in the *eastus* location.
 
-   ```
-   git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git key-vault
-   ```
+```azurecli
+# To list locations: az account list-locations --output table
+az group create --name "<YourResourceGroupName>" --location "East US"
+```
 
-3. Install the dependencies.
+The resource group you just created is used throughout this tutorial.
 
-   ```
-   cd key-vault
-   npm install
-   ```
+## Create an Azure Key Vault
 
-4. Create an Azure service principals, using one of the following:
-   - [Azure CLI](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal-cli/),
-   - [PowerShell](https://azure.microsoft.com/documentation/articles/resource-group-authenticate-service-principal/)
-   - [Azure Portal](https://azure.microsoft.com/documentation/articles/resource-group-create-service-principal-portal/). 
+Next you create a Key Vault using the resource group created in the previous step. Although “ContosoKeyVault” is used as the name for the Key Vault throughout this article, you have to use a unique name. Provide the following information:
 
-    This service principal is to run the sample on your azure account.
+* Vault name - **Select a Key Vault Name here**.
+* Resource group name - **Select a Resource Group Name here**.
+* The location - **East US**.
 
-5. Create another Azure service principal using Azure Portal.
+```azurecli
+az keyvault create --name "<YourKeyVaultName>" --resource-group "<YourResourceGroupName>" --location "East US"
+```
 
-    We will authorize this service principal to access key vault. In this service principal, from the azure portal,
-    create a new key and save it. note down the key value upon hitting save.
-    Also, note down the application id and the object id for the service prinicipals, we would use them later.
+At this point, your Azure account is the only one authorized to perform any operations on this new vault.
 
-6. Set the following environment variables using the information from the service principal that you created.
+## Add a secret to key vault
 
-   ```
-   export AZURE_SUBSCRIPION_ID={your subscription id}
-   export CLIENT_ID={your client id}
-   export APPLICATION_SECRET={your client secret}
-   export DOMAIN={your tenant id as a guid OR the domain name of your org <contosocorp.com>}
-   export OBJECT_ID={Object id of the service principal}
+We're adding a secret to help illustrate how this works. You could be storing a SQL connection string or any other information that you need to keep securely but make available to your application. In this tutorial, the password will be called **AppSecret** and will store the value of **MySecret** in it.
 
-   export SP_KEYVAULT_OPERATIONS={application id of the app, that we want to authorize to interact with keyvault, created in step 5}
-   export OBJECT_ID_KEYVAULT_OPERATIONS={Object id of the app, that we want to authorize to interact with keyvault, created in step 5}
-   export WEATHER_APP_KEY={key value that we noted down in step 5}
+Type the commands below to create a secret in Key Vault called **AppSecret** that will store the value **MySecret**:
 
-   export KEYVAULT_SECRET_NAME=open-weather-map-key
-   ```
+```azurecli
+az keyvault secret set --vault-name "<YourKeyVaultName>" --name "AppSecret" --value "MySecret"
+```
 
-> [AZURE.NOTE] On Windows, use `set` instead of `export`.
+To view the value contained in the secret as plain text:
 
-7. First we need to provision a key vault resource and authorize an app to use it.
+```azurecli
+az keyvault secret show --name "AppSecret" --vault-name "<YourKeyVaultName>"
+```
 
-   ```
-   node index.js
-   ```
+This command shows the secret information including the URI. After completing these steps, you should have a URI to a secret in an Azure Key Vault. Write this information down. You need it in a later step.
 
-8. Get an API key from [openweathermap](http://openweathermap.org/) and securely store it in key vault.
+## Clone the Repo
 
-   ```
-   azure keyvault secret set --vault-name "<key vault name>" --secret-name "open-weather-map-key" "<api key>"
-   ```
+Clone the repo in order to make a local copy for you to edit the source by running the following command:
 
-   Alternatively, you can accomplish this from the Azure portal as well. 
-    
-   > [AZURE.NOTE] 
-   > You should be logged in with a service principal that has access to the key vault resource.
-   > The secret-name should match the environment variable (KEYVAULT_SECRET_NAME) exported
-   > in step 6 above and is also used in weather-app.js.
+```
+git clone https://github.com/Azure-Samples/key-vault-node-quickstart.git
+```
 
-9. Run an app that displays current weather conditions for a given city.
+## Install dependencies
 
-   ```
-   node weather-app.js <key vault name> <city>
-   ```
+Here we install the dependencies. Run the following commands
+    cd key-vault-node-quickstart
+    npm install
 
-   key vault name: not the whole url, just the name from https://&lt;vaultName&gt;.vault.azure.net/
+This project used 2 node modules:
 
-   city: format is <city name, country name/code> e.g: `redmond, us` or `London, uk`. country is optional but it helps
-   in disambiguating city name.
+* [ms-rest-azure](https://www.npmjs.com/package/ms-rest-azure) 
+* [azure-keyvault](https://www.npmjs.com/package/azure-keyvault)
 
-10. To clean up and delete all the resources we created, run the cleanup script.
+## Publish the web application to Azure
 
-   ```
-   node cleanup.js <resourceGroupName> <keyVaultName>
-   ```
+Below are the few steps we need to do
 
-<a id="index"/>
+- The 1st step is to create a [Azure App Service](https://azure.microsoft.com/services/app-service/) Plan. You can store multiple web apps in this plan.
 
-## What index.js does
-
-The sample creates a new key vault, add a key and a secret to the vault, retrieve keys and secrets from it, authorizes an app to use this keyvault's resources.
-
-We start by logging in using your service principal and creating ResourceManagementClient and KeyVaultManagementClient objects. 
-We then perform an authentication handshake with the KeyVault service before creating a KeyVaultClient object.
-
-   ```
-   msRestAzure.loginWithServicePrincipalSecret(clientId, secret, domain).then((err, credentials) => {
-       if (err) return console.log(err);
-       resourceClient = new ResourceManagementClient(credentials, subscriptionId);
-       keyVaultManagementClient = new KeyVaultManagementClient(credentials, subscriptionId);
-
-       var kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
-       keyVaultClient = new KeyVault.KeyVaultClient(kvCredentials);
-    });
-   ```
-
-We then set up a resource group in which we will create the key vault resource.
-
-   ```
-   let groupParameters = { location: location, tags: { sampletag: 'sampleValue' } };
-   return resourceClient.resourceGroups.createOrUpdate(resourceGroupName, groupParameters).then( /* ... */ );
-   ```
-
-The next step is to create and provision a key vault resource.
-
-   ```
-   let keyPermissions = ['get', 'create', ...];
-   let keyVaultParameters = {
-       location: location,
-       properties: {...},
-       tags: {}
-   };
-
-   keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, keyVaultParameters).then( /* ... */ );
-   ```
-
-One a key vault has been provisioned, we interact with it by 
-
-a. adding a key.
-
-   ```
-   let attributes = { expires: new Date(...), notBefore: new Date(...) };
-   let keyOperations = ['encrypt', 'decrypt', ...];
-   let keyOptions = {
-       keyOps: keyOperations,
-       keyAttributes: attributes
-   };
-   let keyName = '<name>';
-
-   keyVaultClient.createKey(vaultUri, keyName, 'RSA', keyOptions).then( /* ... */ );
-   ```
-
-b. set a secret.
-
-   ```
-   let attributes = { expires: new Date(...), notBefore: new Date(...) };
-   let secretOptions = {
-       contentType: 'test secret',
-       secretAttributes: attributes
-   };
-   let secretName = '<name>';
-   let secretValue = '<value>';
-
-   keyVaultClient.setSecret(vaultUri, secretName, secretValue, secretOptions).then( /*  ... */ );
-   ```
-
-c. get all keys from the vault.
-
-   ```
-   keyVaultClient.getKeys(vaultUri).then( /*  ... */ );
-   ```
-
-d. get all secrets from the vault.
-
-   ```
-   keyVaultClient.getSecrets(vaultUri).then( /*  ... */ );
-   ```
-
-Finally, we authorize an app to interact with keyvault, by specifying an access policy.
-To accomplish this, we first get the vault we created from the resource group using a `vaults.get` call.
-We then call `createOrUpdate` on that vault, with updated parameters, which contains an additional `access policy`.
-The `createOrUpdate` call will replace the parameters, so we copy the vault's original properties into our new 
-`parameters` object and append a new `accessPolicyEntry` to it.
-
-   ```
-   keyVaultManagementClient.vaults.get(resourceGroupName, keyVaultName)
-       .then((err, result, httpRequest, response) => {
-           let vault = result;
-
-           let parameters = new keyVaultManagementClient.models.VaultCreateOrUpdateParameters();
-           parameters.location = vault.location;
-           parameters.properties = vault.properties;
-
-           let newAccessPolicyEntry = {
-               tenantId: domain,
-               objectId: objectIdForKeyVault,
-               applicationId: keyVaultSp,
-               permissions: {
-                   keys: ['get', 'list', 'import'],
-                   secrets: ['all']
-               }
-           };
-
-           parameters.properties.accessPolicies.push(newAccessPolicyEntry);
-
-           keyVaultManagementClient.vaults.createOrUpdate(resourceGroupName, keyVaultName, parameters).then( /* ... */ );
-       });
-   ```
-
-In case if we hit an error while executing these steps, we initiate an auto cleanup and exit.
-
-   ```
-   console.log(`performing auto cleanup on error. deleting ${keyVaultName} and ${resourceGroupName}`);
-   cleanup(exit);
-   ```
-
-<a id="weather-app"/>
-
-## What weather-app.js does
-
-The app starts by logging into the azure account, by using your service principal.
-
-We then authenticate with the KeyVault service by using the service principal that was previously authorized 
-to interact with the key vault in index.js (see: SP_KEYVAULT_OPERATIONS)
-
-   ```
-   // authenticate with key vault with a service principal that we gave access in index.js
-   let kvCredentials = new KeyVault.KeyVaultCredentials(authenticator);
-   ```
-
-Once authenticated, we fetch the secret's value from the key vault, which would be our API key for openweathermap.org
-
-   ```
-   // get the secret's value (api key for openweathermap).
-   keyVaultClient.getSecret(vaultUri, (err, result) => { /* ... */ });
-   ```
-
-We then make an http request to openweathermap with the api key and city name and display the weather information.
-
-   ```
-   // query openweathermap api and get weather data.
-   http.get(requestUri, res => { /* ... */ });
-   ```
-
-<a id="cleanup"/>
-
-## What cleanup js does
-
-Running cleanup.js deletes the key vault that the sample created:
-
-   ```
-   console.log('\nDeleting key vault : ' + keyVaultName);
-   return keyVaultManagementClient.vaults.deleteMethod(resourceGroupName, keyVaultName).then( /* ... */ );
-   ```
-
-It also deletes the resource group that the sample created:
-
-   ```
-   console.log('\nDeleting resource group: ' + resourceGroupName);
-   return resourceClient.resourceGroups.deleteMethod(resourceGroupName).then( /* ... */ );
-   ```
-
-## References and further reading
-
-- [Azure SDK for Node.js](https://github.com/Azure/azure-sdk-for-node)
-- [Azure KeyVault Documentation](https://azure.microsoft.com/en-us/documentation/services/key-vault/)
-- [Key Vault REST API Reference](https://msdn.microsoft.com/en-us/library/azure/dn903609.aspx)
-- [Manage Key Vault using CLI](https://azure.microsoft.com/en-us/documentation/articles/key-vault-manage-with-cli/)
-- [Storing and using secrets in Azure](https://blogs.msdn.microsoft.com/dotnet/2016/10/03/storing-and-using-secrets-in-azure/)
+    ```
+    az appservice plan create --name myAppServicePlan --resource-group myResourceGroup
+    ```
+- Next we create a web app. In the following example, replace <app_name> with a globally unique app name (valid characters are a-z, 0-9, and -). The runtime is set to NODE|6.9. To see all supported runtimes, run az webapp list-runtimes
+    ```
+    # Bash
+    az webapp create --resource-group myResourceGroup --plan myAppServicePlan --name <app_name> --runtime "NODE|6.9" --deployment-local-git
+    # PowerShell
+    az --% webapp create --resource-group myResourceGroup --plan myAppServicePlan --name <app_name> --runtime "NODE|6.9"
+    ```
+    When the web app has been created, the Azure CLI shows output similar to the following example:
+    ```
+    {
+      "availabilityState": "Normal",
+      "clientAffinityEnabled": true,
+      "clientCertEnabled": false,
+      "cloningInfo": null,
+      "containerSize": 0,
+      "dailyMemoryTimeQuota": 0,
+      "defaultHostName": "<app_name>.azurewebsites.net",
+      "enabled": true,
+      "deploymentLocalGitUrl": "https://<username>@<app_name>.scm.azurewebsites.net/<app_name>.git"
+      < JSON data removed for brevity. >
+    }
+    ```
+    Browse to your newly created web app and you should see a functioning web app. Replace <app_name> with a unique app name.
+
+    ```
+    http://<app name>.azurewebsites.net
+    ```
+    The above command also creates a Git-enabled app which allows you to deploy to azure from your local git. 
+    Local git is configured with url of 'https://<username>@<app_name>.scm.azurewebsites.net/<app_name>.git'
+
+- Create a deployment user
+    After the previous command is completed you can add add an Azure remote to your local Git repository. Replace <url> with the URL of the Git remote that you got from Enable Git for your app.
+
+    ```
+    git remote add azure <url>
+    ```
+
+## Enable Managed Service Identity
+
+Azure Key Vault provides a way to securely store credentials and other keys and secrets, but your code needs to authenticate to Key Vault to retrieve them. Managed Service Identity (MSI) makes solving this problem simpler by giving Azure services an automatically managed identity in Azure Active Directory (Azure AD). You can use this identity to authenticate to any service that supports Azure AD authentication, including Key Vault, without having any credentials in your code.
+
+Run the assign-identity command to create the identity for this application:
+
+```azurecli
+az webapp identity assign --name <app_name> --resource-group "<YourResourceGroupName>"
+```
+
+This command is the equivalent of going to the portal and switching **Managed service identity** to **On** in the web application properties.
+
+### Assign permissions to your application to read secrets from Key Vault
+
+Write down or copy the output of the command above. It should be in the format:
+        
+        {
+          "principalId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          "type": "SystemAssigned"
+        }
+        
+Then, run this command using the name of your Key Vault and the value of PrincipalId copied from above:
+
+```azurecli
+az keyvault set-policy --name '<YourKeyVaultName>' --object-id <PrincipalId> --secret-permissions get
+```
+
+## Deploy the Node App to Azure and retrieve the secret value
+
+Now that everything is set. Run the following command to deploy the app to Azure
+
+```
+git push azure master
+```
+
+After this when you browse https://<app_name>.azurewebsites.net you can see the secret value.
+Make sure that you replaced the name <YourKeyVaultName> with your vault name
+
+## Next steps
+
+* [Azure Key Vault Home Page](https://azure.microsoft.com/services/key-vault/)
+* [Azure Key Vault Documentation](https://docs.microsoft.com/azure/key-vault/)
+* [Azure SDK For Node](https://docs.microsoft.com/javascript/api/overview/azure/key-vault)
+* [Azure REST API Reference](https://docs.microsoft.com/rest/api/keyvault/)
+# Contributing
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
