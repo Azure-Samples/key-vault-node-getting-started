@@ -7,7 +7,7 @@ author: balajikris
 # Getting started with Key Vault in Node.js
 
 This sample demonstrates how to create and manage a keyvault and interact with it in Node.js. We will also write an app
-that consumes information from the key vault.
+that consumes information from the key vault
 
 ## Introduction
 
