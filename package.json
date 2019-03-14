@@ -1,6 +1,6 @@
 {
     "name": "key-vault-node-quickstart",
-    "contributors": "prashanthyv"
+    "contributors": "prashanthyv",
     "description": "Simple Hello World Node.js sample for Azure Key Vault using Managed Service Identity",
     "version": "0.0.1",
     "private": true,
