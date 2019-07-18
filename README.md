@@ -1,7 +1,11 @@
 ---
-services: key-vault
-platforms: nodejs
-author: prashanthyv
+page_type: sample
+description: This QuickStart shows how to store a secret in Key Vault and how to retrieve it using a Web app.
+languages:
+  - javascript
+  - nodejs
+products:
+  - azure-key-vault
 ---
 
 # Quickstart: Set and retrieve a secret from Azure Key Vault using a Node Web App 
