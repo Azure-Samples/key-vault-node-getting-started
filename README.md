@@ -6,9 +6,10 @@ languages:
   - nodejs
 products:
   - azure-key-vault
+urlFragment: quickstart-set-and-retrieve-a-secret-from-azure-key-vault-using-a-node-web-app
 ---
 
-# Quickstart: Set and retrieve a secret from Azure Key Vault using a Node Web App 
+# Quickstart: Set and retrieve a secret from Azure Key Vault using a Node Web App (App Service)
 
 This QuickStart shows how to store a secret in Key Vault and how to retrieve it using a Web app. This web app uses Azure App Services. You can see it run on Azure. The quickstart uses Node.js and Managed service identities (MSIs)
 
