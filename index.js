@@ -5,37 +5,40 @@
  */
 'use strict';
 var http = require('http');
-const {DefaultAzureCredential, ManagedIdentityCredential} = require('@azure/identity');
-const {SecretClient} = require('@azure/keyvault-secrets');
+const KeyVault = require('azure-keyvault');
+const msRestAzure = require('ms-rest-azure');
 
-const credential = new DefaultAzureCredential();
-
-// Replace value with your Key Vault name here
-const vaultName = "<YourVaultName>";
-const url = `https://${vaultName}.vault.azure.net`;
-  
-const client = new SecretClient(url, credential);
-
-// Replace value with your secret name and value here
-const secretName = "my-secret";
-const secretValue = 'test-secret-value'
 
 var server = http.createServer(function(request, response) {
     response.writeHead(200, {"Content-Type": "text/plain"});
-    async function main(){
-        // Get the secret we created
-        const secret = await client.setSecret(secretName, secretValue);
-        const result = await client.getSecret(secretName);
-        response.write(`Your secret value is: ${result.value}\n`);
-        response.write("Successfully retrieved 'test-secret'");
-        response.end();
-    }
-    main().catch((err) => {
-        response.write(`error code: ${err.code}`);
-        response.write(`error message: ${err.message}`);
-        response.write(`error stack: ${err.stack}`);
-        response.end();
-    });
+});
+
+// The ms-rest-azure library allows us to login with MSI by providing the resource name. In this case the resource is Key Vault.
+// For public regions the resource name is Key Vault
+msRestAzure.loginWithAppServiceMSI({resource: 'https://vault.azure.net'}).then( (credentials) => {
+    const keyVaultClient = new KeyVault.KeyVaultClient(credentials);
+
+    var vaultUri = "https://" + "<YourVaultName>" + ".vault.azure.net/";
+    
+    // We're setting the Secret value here and retrieving the secret value
+    keyVaultClient.setSecret(vaultUri, 'my-secret', 'test-secret-value', {})
+        .then( (kvSecretBundle, httpReq, httpResponse) => {
+            console.log("Secret id: '" + kvSecretBundle.id + "'.");
+            return keyVaultClient.getSecret(kvSecretBundle.id, {});
+        })
+        .then( (bundle) => {
+            console.log("Successfully retrieved 'test-secret'");
+            console.log(bundle);
+        })
+        .catch( (err) => {
+            console.log(err);
+        });
+
+    // Below code demonstrates how to retrieve a secret value
+    
+    // keyVaultClient.getSecret(vaultUri, "AppSecret", "").then(function(response){
+    //     console.log(response);    
+    // })
 });
 
 var port = process.env.PORT || 1337;
