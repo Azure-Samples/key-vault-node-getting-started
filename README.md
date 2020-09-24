@@ -23,9 +23,9 @@ This QuickStart shows how to store a secret in Key Vault and how to retrieve it 
 Before you proceed make sure that you are familiar with the [basic concepts](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis#basic-concepts).
 
 ## This sample shows how to do the following operations of Key Vault secret with Key Vault SDK
-- create server by the http
-- create a new secret
-- get the secret
+- Create server by the http
+- Create a new secret
+- Get the secret
 
 ## Prerequisites
 
@@ -198,10 +198,10 @@ The Key Vault secrets SDK here is **@azure/keyvault-secrets**, if you are using 
 
  * [helloworld.ts](https://github.com/Azure/azure-sdk-for-js/blob/master/sdk/keyvault/keyvault-secrets/samples/typescript/src/helloWorld.ts) - Examples for common Key Vault secret tasks:
 
- * create a new secret
- * get the secret
- * update the secret
- * delete the secret
+   * Create a new secret
+   * Get the secret
+   * Update the secret
+   * Delete the secret
 
 ## Next steps
 
