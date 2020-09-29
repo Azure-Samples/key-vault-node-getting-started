@@ -27,6 +27,17 @@ Before you proceed make sure that you are familiar with the [basic concepts](htt
 - Create a new secret
 - Get the secret
 
+## Use latest Key Vault SDK
+
+The Key Vault secrets SDK in this repo is **@azure/keyvault-secrets**. It's strongly recommended that you use the [latest](https://www.npmjs.com/package/@azure/keyvault-secrets) version of the key vault SDK package, please refer to the following examples:
+
+ * [helloworld.ts](https://github.com/Azure/azure-sdk-for-js/blob/master/sdk/keyvault/keyvault-secrets/samples/typescript/src/helloWorld.ts) - Examples for common Key Vault secret tasks:
+
+   * Create a new secret
+   * Get the secret
+   * Update the secret
+   * Delete the secret
+
 ## Prerequisites
 
 * [Node JS](https://nodejs.org/en/)
@@ -191,17 +202,6 @@ git push azure master
 
 After this when you browse https://<app_name>.azurewebsites.net you can see the secret value.
 Make sure that you replaced the name <YourKeyVaultName> with your vault name
-
-## Use latest Key Vault SDK
-
-The Key Vault secrets SDK here is **@azure/keyvault-secrets**, if you are using the [latest](https://www.npmjs.com/package/@azure/keyvault-secrets) version of the key vault SDK package, please refer to the following examples:
-
- * [helloworld.ts](https://github.com/Azure/azure-sdk-for-js/blob/master/sdk/keyvault/keyvault-secrets/samples/typescript/src/helloWorld.ts) - Examples for common Key Vault secret tasks:
-
-   * Create a new secret
-   * Get the secret
-   * Update the secret
-   * Delete the secret
 
 ## Next steps
 
