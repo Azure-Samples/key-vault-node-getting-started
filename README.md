@@ -104,13 +104,13 @@ This command shows the secret information including the URI. After completing th
 Clone the repo in order to make a local copy for you to edit the source by running the following command:
 
 ```
-git clone https://github.com/Azure-Samples/key-vault-node-quickstart.git
+git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git
 ```
 
 ## Install dependencies
 
 Here we install the dependencies. Run the following commands
-    cd key-vault-node-quickstart
+    cd key-vault-node-getting-started
     npm install
 
 This project used 2 node modules:
