@@ -22,6 +22,22 @@ This QuickStart shows how to store a secret in Key Vault and how to retrieve it 
 
 Before you proceed make sure that you are familiar with the [basic concepts](https://docs.microsoft.com/en-us/azure/key-vault/key-vault-whatis#basic-concepts).
 
+## This sample shows how to do the following operations of Key Vault secret with Key Vault SDK
+- Create server by the http
+- Create a new secret
+- Get the secret
+
+## Use latest Key Vault SDK
+
+The Key Vault secrets SDK in this repo is **@azure/keyvault-secrets**. It's strongly recommended that you use the [latest](https://www.npmjs.com/package/@azure/keyvault-secrets) version of the key vault SDK package, please refer to the following examples:
+
+ * [helloworld.ts](https://github.com/Azure/azure-sdk-for-js/blob/master/sdk/keyvault/keyvault-secrets/samples/typescript/src/helloWorld.ts) - Examples for common Key Vault secret tasks:
+
+   * Create a new secret
+   * Get the secret
+   * Update the secret
+   * Delete the secret
+
 ## Prerequisites
 
 * [Node JS](https://nodejs.org/en/)
@@ -88,13 +104,13 @@ This command shows the secret information including the URI. After completing th
 Clone the repo in order to make a local copy for you to edit the source by running the following command:
 
 ```
-git clone https://github.com/Azure-Samples/key-vault-node-quickstart.git
+git clone https://github.com/Azure-Samples/key-vault-node-getting-started.git
 ```
 
 ## Install dependencies
 
 Here we install the dependencies. Run the following commands
-    cd key-vault-node-quickstart
+    cd key-vault-node-getting-started
     npm install
 
 This project used 2 node modules:
